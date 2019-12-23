@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Snake</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href=""> -->
+    <style>
+      .game-base {
+        background: #a3a3a3;
+        height: 400px;
+        min-width: 400px;
+        display: flex;
+      }
+      .game-board {
+        width: 300px;
+        height: 300px;
+        margin: auto;
+        position: relative;
+        background: #f7f7f7;
+      }
+      .snake-body,
+      .snake-food {
+        width: 5px;
+        height: 5px;
+        position: absolute;
+      }
+      .snake-food {
+        background: green;
+      }
+      .snake-body {
+        background: red;
+      }
+    </style>
+  </head>
+  <body>
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div class="game-base">
+      <section class="game-board">
+      </section>
+      <button type="button" class="game-action">
+        START
+      </button>
+    </div>
+    <script src="./snake.js" async defer></script>
+    <script>
+      window.onload = function() {
+        const speed = 100;
+        let start = false;
+        const board = document.querySelector('.game-board');
+        const dot = document.createElement('span');
+        const snake = new Snake(board);
+
+        let food_position = [];
+        let feedInterval = null;
+        let positionSnake = null;
+        dot.classList.add('snake-food');
+
+        document.querySelector('.game-action')
+          .onclick = function() {
+            if (!start) {
+              this.innerHTML = 'STOP';
+              start = true;
+              board.append(dot);
+              feedingFood();
+              snake.initial_snake(...getRandomPosition());
+              window.addEventListener('keydown', handlePath)
+            } else {
+              this.innerHTML = 'START';
+              start = false;
+              snake.remove_snake();
+              feedingFood(true);
+              clearInterval(positionSnake);
+              window.removeEventListener('keydown', handlePath)
+            }
+          }
+        
+        function feedingFood(pause = false) {
+          if (feedInterval || pause) {
+            clearInterval(feedInterval);
+          }
+          if (pause) {
+            return;
+          }
+          getFood();
+          feedInterval = setInterval(getFood, 5000);
+        }
+
+        function getFood() {
+          const [x, y] = getRandomPosition();
+          food_position[0] = x;
+          food_position[1] = y;
+          Object.assign(dot.style, {
+            top: `${y * 5}px`,
+            left: `${x * 5}px`,
+          });
+          snake.set_food(x, y);
+        }
+
+        function handlePath(event) {
+          let path_fix = [];
+          switch (event.keyCode) {
+            case 37:
+              path_fix = [-1, 0];
+              break;
+            case 38:
+              path_fix = [0, -1];
+              break;
+            case 39:
+              path_fix = [1, 0];
+              break;
+            case 40:
+              path_fix = [0, 1];
+              break;
+            default:
+              break;
+          }
+          if ([37, 38, 39, 40].includes(event.keyCode)) {
+            snake.moveSnake(path_fix, feedingFood);
+            if (positionSnake) {
+              clearInterval(positionSnake);
+            }
+            positionSnake = setInterval(
+              () => {snake.moveSnake(path_fix, feedingFood)},
+              speed,
+            );
+          }
+        }
+
+        function getRandomPosition() {
+          const x = Math.floor(Math.random() * 60);
+          const y = Math.floor(Math.random() * 60);
+          return [x, y];
+        }
+      }
+    </script>
+  </body>
+</html>
