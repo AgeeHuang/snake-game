@@ -16,6 +16,16 @@
         height: 400px;
         min-width: 400px;
         display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .game-action {
+        width: 100px;
+        height: 30px;
+        outline: none;
+        cursor: pointer;
+        border-radius: 2px;
+        border: 2px solid #3c3c3c;
       }
       .game-board {
         width: 300px;
@@ -43,11 +53,11 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <div class="game-base">
-      <section class="game-board">
-      </section>
       <button type="button" class="game-action">
         START
       </button>
+      <section class="game-board">
+      </section>
     </div>
     <script src="./snake.js" async defer></script>
     <script>
